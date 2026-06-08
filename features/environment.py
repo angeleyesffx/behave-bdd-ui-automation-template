@@ -2,11 +2,9 @@ import os
 import yaml
 import datetime
 from selenium import webdriver
-from allure_behave.hooks import allure_report
 from Screenshot import Screenshot_Clipping
 
 _file_path = os.path.dirname(__file__)
-allure_report(_file_path + "/results")
 
 
 def browser_config(context, browser_name):

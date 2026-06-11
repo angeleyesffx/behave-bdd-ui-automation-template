@@ -1,150 +1,203 @@
-# Python-Behave
+# Python Behave — BDD UI Automation Framework
 
-**Install Python/behave framework**
+A template for browser and API test automation using [Behave](https://behave.readthedocs.io/en/latest/) (Python BDD), Selenium 4, and the Page Object Model pattern.
 
-**IMPORTANT ---->>>>  This automation needs Python 3.8 or above**
+---
 
-***Step 1:*** Download and Install the latest version of Python on the official site: https://www.python.org/downloads/
-        
-You can find Installation Guide to your system here:  https://realpython.com/installing-python/
+## Requirements
 
+- Python 3.12+
+- pip (updated)
 
-***Step 2:*** Install or Update pip
-        
-You can find Installation Guide to your system here:  https://pypi.org/project/pip/
+---
 
-***Step 3:*** Create a virtual environment
+## Setup
 
-Inside Pytest folder, follow the steps described at:
+**Step 1 — Create and activate a virtual environment**
 
-https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#creating-a-virtual-environment
+```bash
+python -m venv env
+source env/bin/activate        # macOS / Linux
+env\Scripts\activate           # Windows
+```
 
-Then activate the virtual environment by running the command:
+**Step 2 — Install dependencies**
 
-* `source env/bin/activate`
+```bash
+pip install -r requirements.txt
+```
 
-***Step 4:*** Install all dependencies listed on requirements.txt inside your project
-        Execute the command line:
-        
-* `pip install -r requirements.txt` 
+> Selenium 4.6+ includes **Selenium Manager**, which downloads the correct browser driver automatically. No manual ChromeDriver/GeckoDriver installation is required.
 
-**IMPORTANT ---->>>>  If you need to install the dependencies in separate execute the command line:**
-                  
-                  
-> **Make sure that your pip installation is update!** 
+**Step 3 — Configure environment variables**
 
-        
-* `pip install SomeDependencie` 
+Copy `.env.example` to `.env` and fill in your credentials:
 
-***Step 5:*** Install Selenium, and the appropriate webdrivers
-       
-You can find an installation Guide here:  https://selenium-python.readthedocs.io/installation.html
-Download links for your Driver:
-        
-        
-| Browser | Link                                                                  |
-| ------  | --------------------------------------------------------------------- |
-| Chrome: | https://sites.google.com/a/chromium.org/chromedriver/downloads        |
-| Edge:   | https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/ | 
-| Firefox:| https://github.com/mozilla/geckodriver/releases                       | 
-| Safari: | https://webkit.org/blog/6900/webdriver-support-in-safari-10/          | 
+```bash
+cp .env.example .env
+```
 
-**Linux Ubuntu Reinstall**
-If you have a Drive installed, and you need to update it:
+```dotenv
+APP_USER=your_app_username
+APP_PASSWORD=your_app_password
+BASE_URL=https://your-app.com/api
+SOME_API_USER=some_user
+SOME_API_PASSWORD=some_password
+WHATEVER_API_USER=whatever_user
+WHATEVER_API_PASSWORD=whatever_password
+```
 
-* `sudo apt-get --only-upgrade install google-chrome-stable`
+Non-sensitive config (URLs per environment) lives in [features/config.yml](features/config.yml).
 
-***Step 1: Delete it***
-* `sudo rm -f /usr/bin/chromedriver`
-* `sudo rm -f /usr/local/bin/chromedriver`
-* `sudo rm -f /usr/local/share/chromedriver`
+---
 
-***Step 2: Download, Update and install dependencies***
-* `sudo apt update -y && sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip`
+## Running Tests
 
-***Step 3: Download driver and unzip it***
-* `wget https://chromedriver.storage.googleapis.com/{driver_version}/chromedriver_linux64.zip` 
-* `unzip chromedriver_linux64.zip`
-* `chmod +x chromedriver`
+**Run the full suite**
 
-***Step 4: Move the driver executable and create symlinks***
-* `sudo mv -f chromedriver /usr/local/share/chromedriver`
-* `sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver` 
-* `sudo ln -s /usr/local/share/chromedriver /usr/bin/chromedriver` 
+```bash
+python -m behave
+```
 
-For Mac:
-https://www.swtestacademy.com/install-chrome-driver-on-mac/
+**Run without output capture (useful for debugging)**
 
+```bash
+python -m behave --no-capture
+```
 
-For Linux Ubuntu:
+**Run a specific feature file**
 
-***Chrome:***
+```bash
+python -m behave features/search.feature
+```
 
-***Step 1: Download Geckodriver***
-*   `wget -N https://chromedriver.storage.googleapis.com/{driver_version}/chromedriver_linux64.zip -P ~/`
+**Run by tag**
 
-***Step 2: Extract the file***
-*   `tar -xvzf chomedriver*`
+```bash
+# Smoke tests only
+python -m behave --tags=@smoke
 
-***Step 3: Make it executable***
-*   `sudo mv geckodriver /usr/bin/chomedriver`
-*   `sudo chown root:root /usr/bin/chomedriver`
-*   `sudo chmod +x /usr/bin/chomedriver`
+# All negative scenarios
+python -m behave --tags=@negative
 
-***Firefox:***
+# A specific test case
+python -m behave --tags=@TC-S001
 
-***Step 1: Download Geckodriver***
-*   `wget https://github.com/mozilla/geckodriver/releases/download/{driver_version}/geckodriver-{driver_version}-linux64.tar.gz`
+# Only UI tests, excluding login
+python -m behave --tags="@ui and not @feature-login"
+```
 
-***Step 2: Extract the file***
-*   `tar -xvzf geckodriver*`
+**Re-run only failed scenarios from the last run**
 
-***Step 3: Make it executable***
-*   `sudo mv geckodriver /usr/bin/geckodriver`
-*   `sudo chown root:root /usr/bin/geckodriver`
-*   `sudo chmod +x /usr/bin/geckodriver`
+```bash
+python -m behave @rerun.txt
+```
 
-       
+---
 
-**User Guide of Behave Framework:**
+## Options
 
-You can find information about behave framework here:  https://behave.readthedocs.io/en/latest/
-You can find information more information about command line here: https://docs.python.org/3/using/cmdline.html
+**Change browser** (default: `chrome`)
 
-You can find information more information about command line here: https://docs.python.org/3/using/cmdline.html
+| Value | Browser |
+|---|---|
+| `chrome` | Google Chrome |
+| `headless-chrome` | Chrome headless (no UI, for CI) |
+| `firefox` | Mozilla Firefox |
+| `edge` | Microsoft Edge |
 
-**IMPORTANT ---->>>> If you install python3 instead python using in command line python3:**
+```bash
+python -m behave -D browser=headless-chrome
+```
 
-* `python3 -m behave --no-capture` 
+**Change environment** (default: `homolog`)
 
-For change the environment use -D environment=SOME_ENVIRONMENT like command line below:
-        *The default environment is always define by behave.ini*
-      
-* `python -m behave -D environment=homolog` 
+```bash
+python -m behave -D environment=desenv
+```
 
-For change the browser use -D browser=SOME_BROWSER like command line below:
-        *The default browser is always define by behave.ini*
-       
-*  `python -m behave -D browser=headless-chrome` 
+**Combine options**
 
-For execute a specific feature execute the command line:
-        
-* `python -m behave features_path/feature_name.feature` 
+```bash
+python -m behave --no-capture -D environment=desenv -D browser=headless-chrome --tags=@smoke
+```
 
-For execute a specific WIP scenario, or a list of WIP scenarios use above scenario @wip and execute the command line:
-      
-* `python -m behave -D environment=desenv --tags=@wip` 
+---
 
-By default, behave captures stdout, this captured output is only showing if a failure occurs.
-To print output execute the command line:
-    
-* `python -m behave --no-capture`
+## Tag Strategy
 
-**IMPORTANT ---->>>>  You can combine the command lines to execute your project**
+Tags follow an ISTQB-aligned traceability model. Every scenario carries:
 
-Example:
-      
-* `python -m behave --no-capture -D environment=desenv -D browser=firefox --tags=@wip features_path/feature_name.feature` 
+| Tag | Purpose | Example |
+|---|---|---|
+| `@ui` / `@api` | Test type | `@ui` |
+| `@feature-*` | Feature group | `@feature-search` |
+| `@smoke` | Fast regression | `@smoke` |
+| `@negative` | Negative/error path | `@negative` |
+| `@TC-xxx` | Traceability ID | `@TC-S001` |
 
+Current test cases:
 
+| ID | Feature | Type |
+|---|---|---|
+| `@TC-S001` | Search returns relevant results | smoke |
+| `@TC-S002` | Search navigates away from home page | negative |
+| `@TC-L001` | Login with valid credentials | smoke |
+| `@TC-L002` | Login with invalid credentials shows error | negative |
+| `@TC-A001` | API authentication returns home data | smoke |
+| `@TC-A002` | API with invalid credentials returns 401 | negative |
 
+---
+
+## Project Structure
+
+```
+.github/
+  workflows/
+    tests.yml       # CI pipeline (smoke on push, full suite on dispatch)
+features/
+  pages/            # Page Object classes (BasePage + one class per page)
+  steps/            # Step definitions (one file per feature/domain)
+  config.yml        # Environment URLs (no credentials)
+  datapool.py       # In-memory test data (credentials from env vars)
+  environment.py    # Behave hooks (before/after scenario, driver setup)
+  object.py         # Page object factory (Singleton per scenario)
+.env.example        # Template for required environment variables
+behave.ini          # Default Behave configuration
+```
+
+---
+
+## Reports
+
+Test reports are written to `build/behave.reports/` after each run:
+
+- **JUnit XML** — for CI integration (Jenkins, GitHub Actions, etc.)
+- **Progress report** — `progress3_report.txt`
+- **Rerun file** — `rerun.txt` (re-execute only failed scenarios)
+
+Screenshots on failure are saved to `features/screenshots/`.
+
+---
+
+## CI/CD
+
+The GitHub Actions workflow at [.github/workflows/tests.yml](.github/workflows/tests.yml) defines two jobs:
+
+| Job | Trigger | Scope | Secrets required |
+|---|---|---|---|
+| `smoke-ui` | push / pull request | `@feature-search` | No |
+| `full-suite` | `workflow_dispatch` (manual) | tag input (default `@smoke`) | Yes |
+
+To run the full suite manually, go to **Actions → BDD UI Tests → Run workflow** and enter the desired tags (e.g. `@smoke`, `@feature-login`, `@feature-auth`).
+
+Configure the following secrets in your repository settings before triggering `full-suite`:
+`APP_USER`, `APP_PASSWORD`, `BASE_URL`, `SOME_API_USER`, `SOME_API_PASSWORD`, `WHATEVER_API_USER`, `WHATEVER_API_PASSWORD`.
+
+---
+
+## References
+
+- [Behave documentation](https://behave.readthedocs.io/en/latest/)
+- [Selenium documentation](https://www.selenium.dev/documentation/)
+- [Page Object Model](https://www.selenium.dev/documentation/test_practices/encouraged/page_object_models/)

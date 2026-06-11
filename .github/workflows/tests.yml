@@ -24,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version-file: .python-version
+          python-version: "3.12"
           cache: pip
 
       - name: Install dependencies
@@ -38,16 +38,7 @@ jobs:
           python -m behave \
             --tags @feature-search \
             -D browser=headless-chrome \
-            -f pretty \
-            -f allure_behave.formatter:AllureFormatter -o allure-results/
-
-      - name: Upload Allure results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-results-smoke
-          path: allure-results/
-          retention-days: 30
+            -f pretty
 
       - name: Upload JUnit reports
         if: always()
@@ -68,7 +59,6 @@ jobs:
   full-suite:
     name: Full Suite (manual)
     runs-on: ubuntu-latest
-    # Only runs when triggered manually via workflow_dispatch
     if: github.event_name == 'workflow_dispatch'
 
     steps:
@@ -78,7 +68,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version-file: .python-version
+          python-version: "3.12"
           cache: pip
 
       - name: Install dependencies
@@ -100,16 +90,7 @@ jobs:
           python -m behave \
             --tags "${{ github.event.inputs.tags }}" \
             -D browser=headless-chrome \
-            -f pretty \
-            -f allure_behave.formatter:AllureFormatter -o allure-results/
-
-      - name: Upload Allure results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-results-full
-          path: allure-results/
-          retention-days: 30
+            -f pretty
 
       - name: Upload JUnit reports
         if: always()

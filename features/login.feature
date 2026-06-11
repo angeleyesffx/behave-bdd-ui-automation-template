@@ -1,16 +1,18 @@
+@ui @feature-login
 Feature: Login MyHome
-  As an user from MyHome,
-  I want to fill the fields with my credentials,
-  So I can Sign In on MyHome.
+  As a user of MyHome,
+  I want to sign in with my credentials,
+  So I can access the platform.
 
   Background:
     Given I navigate to the Login page
 
-  Scenario Outline: Login MyHome
-    When I fill the credentials from <user>
+  @smoke @TC-L001
+  Scenario: Successful login with valid credentials redirects to home page
+    When I fill the credentials from valid user
     Then I should see the my home page
 
-    Examples:
-        | user          |
-        | valid user    |
-        | invalid user  |
+  @negative @TC-L002
+  Scenario: Login with invalid credentials shows authentication error
+    When I fill the credentials from invalid user
+    Then I should see an authentication error message

@@ -1,3 +1,4 @@
+@ui @feature-search
 Feature: Search
   As a web surfer,
   I want to find information online,
@@ -6,11 +7,17 @@ Feature: Search
   Background:
     Given I navigate to the Google Home page
 
-  Scenario Outline: Search the terms on Google
+  @smoke @TC-S001
+  Scenario Outline: Successful search returns relevant results
     When I search for <data>
     Then I should see the results
 
     Examples:
-        | data          |
-        | python        |
-        | ruby          |
+      | data   |
+      | python |
+      | ruby   |
+
+  @negative @TC-S002
+  Scenario: Search action navigates away from the home page
+    When I search for python
+    Then the URL should contain the search query

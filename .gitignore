@@ -4,14 +4,13 @@
 # JIRA plugin
 atlassian-ide-plugin.xml
 
-# Python-Behave
-Python-Behave/build
-Python-Behave/pytest-env
-Python-Behave/venv
-Python-Behave/.idea
-Python-Behave/features/screenshots/
-Python-Behave/features/results/
-Python-Behave/features/reports/
+# Project build artifacts and runtime outputs
+build/
+features/screenshots/
+rerun.txt
+rerun.output
+*.output
+
 
 
 # Byte-compiled / optimized / DLL files

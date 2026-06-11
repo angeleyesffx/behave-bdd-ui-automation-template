@@ -1,30 +1,47 @@
-import time
 from behave import *
-from nose.tools import assert_equals
 from selenium.webdriver.common.by import By
-from features.datapool import DATA_ACCESS
-from features.object import Singleton
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+from features.datapool import DATA_ACCESS
+from features.object import Singleton
+from features.pages.basepage import BasePage
 from features.pages.loginpage import LoginPage
-
+from features.pages.homepage import HomePage
 
 
 @given(u'I navigate to the Login page')
 def navigate_to_login_page(context):
-    loginPage = Singleton.getInstance(context, LoginPage)
-    time.sleep(5)
+    context.browser.get(context.location)
+
 
 @when(u'I fill the credentials from {user}')
-def search_for(context, user):
-    loginPage = Singleton.getInstance(context, LoginPage)
-    element = WebDriverWait(context.browser, 360).until(EC.presence_of_element_located((By.CSS_SELECTOR, loginPage.card_box_layout)))
-    email_field = context.browser.find_element_by_id(loginPage.email_field).send_keys(context.user)
-    password_field = context.browser.find_element_by_id(loginPage.password_field).send_keys(context.password)
-    context.browser.find_element_by_id(loginPage.sign_in_button).click()
+def fill_credentials(context, user):
+    login_page = Singleton.getInstance(context, LoginPage)
+    email = BasePage.datapool_read(DATA_ACCESS, user, 'email')
+    password = BasePage.datapool_read(DATA_ACCESS, user, 'password')
+    WebDriverWait(context.browser, 30).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, login_page.card_box_layout))
+    )
+    context.browser.find_element(By.ID, login_page.email_field).send_keys(email)
+    context.browser.find_element(By.ID, login_page.password_field).send_keys(password)
+    context.browser.find_element(By.ID, login_page.sign_in_button).click()
 
 
 @then(u'I should see the my home page')
-def get_results(context):
-    loginPage = Singleton.getInstance(context, LoginPage)
-    assert context.browser.find_element_by_css_selector(loginPage.first_result).text, "Download Python | Python.org"
+def verify_home_page(context):
+    home_page = Singleton.getInstance(context, HomePage)
+    result = WebDriverWait(context.browser, 15).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, home_page.first_result))
+    )
+    assert result.is_displayed(), \
+        f"Expected home page content to be visible after login on '{context.browser.current_url}'"
+
+
+@then(u'I should see an authentication error message')
+def verify_auth_error(context):
+    login_page = Singleton.getInstance(context, LoginPage)
+    error = WebDriverWait(context.browser, 15).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, login_page.error_message))
+    )
+    assert error.is_displayed(), \
+        f"Expected authentication error message after invalid login on '{context.browser.current_url}'"

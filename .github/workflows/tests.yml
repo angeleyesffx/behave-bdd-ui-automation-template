@@ -1,0 +1,128 @@
+name: BDD UI Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: "Behave tags to run (e.g. @smoke, @feature-login, @feature-auth)"
+        required: false
+        default: "@smoke"
+
+jobs:
+  smoke-ui:
+    name: Smoke — Search UI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Run smoke tests
+        run: |
+          python -m behave \
+            --tags @feature-search \
+            -D browser=headless-chrome \
+            -f pretty \
+            -f allure_behave.formatter:AllureFormatter -o allure-results/
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-smoke
+          path: allure-results/
+          retention-days: 30
+
+      - name: Upload JUnit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-reports-smoke
+          path: build/behave.reports/
+          retention-days: 30
+
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots-smoke
+          path: features/screenshots/
+          retention-days: 7
+
+  full-suite:
+    name: Full Suite (manual)
+    runs-on: ubuntu-latest
+    # Only runs when triggered manually via workflow_dispatch
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Run selected tests
+        env:
+          APP_USER: ${{ secrets.APP_USER }}
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          SOME_API_USER: ${{ secrets.SOME_API_USER }}
+          SOME_API_PASSWORD: ${{ secrets.SOME_API_PASSWORD }}
+          WHATEVER_API_USER: ${{ secrets.WHATEVER_API_USER }}
+          WHATEVER_API_PASSWORD: ${{ secrets.WHATEVER_API_PASSWORD }}
+        run: |
+          python -m behave \
+            --tags "${{ github.event.inputs.tags }}" \
+            -D browser=headless-chrome \
+            -f pretty \
+            -f allure_behave.formatter:AllureFormatter -o allure-results/
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-full
+          path: allure-results/
+          retention-days: 30
+
+      - name: Upload JUnit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-reports-full
+          path: build/behave.reports/
+          retention-days: 30
+
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots-full
+          path: features/screenshots/
+          retention-days: 7

@@ -2,15 +2,8 @@ homolog:
    url: http://www.google.com
    some_api_url: https://some_api:8080
    whatever_api_url: http://whatever:8000
-   username_some_api: some_user
-   password_some_api: SomePWD
-   username_whatever_api: whateverUser
-   password_whatever_api: '@WhatEver01'
+
 desenv:
    url: http://www.hotmail.com
    some_api_url: https://some_api:8080
    whatever_api_url: http://whatever:8000
-   username_some_api: some_user
-   password_some_api: SomePWD
-   username_whatever_api: whateverUser
-   password_whatever_api: '@WhatEver01'

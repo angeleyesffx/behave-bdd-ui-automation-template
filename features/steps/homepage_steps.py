@@ -8,8 +8,8 @@ from features.object import Singleton
 from features.pages.homepage import HomePage
 
 
-@given(u'I navigate to the Google Home page')
-def navigate_to_home_page(context):
+@given(u'I navigate to the Products page')
+def navigate_to_products_page(context):
     home = Singleton.getInstance(context, HomePage)
     context.browser.get(home.project_url)
 
@@ -18,11 +18,12 @@ def navigate_to_home_page(context):
 def search_for(context, search_data):
     home = Singleton.getInstance(context, HomePage)
     search_bar = WebDriverWait(context.browser, 15).until(
-        EC.presence_of_element_located((By.NAME, home.search_bar))
+        EC.presence_of_element_located((By.ID, home.search_bar))
     )
     search_bar.clear()
-    info = home.datapool_read(DATA_ACCESS, search_data, 'language')
-    search_bar.send_keys(info + Keys.RETURN)
+    keyword = home.datapool_read(DATA_ACCESS, search_data, 'keyword')
+    search_bar.send_keys(keyword)
+    context.browser.find_element(By.ID, home.search_button).click()
 
 
 @then(u'I should see the results')
@@ -35,8 +36,11 @@ def get_results(context):
         f"Expected search results to be visible but none found on '{context.browser.current_url}'"
 
 
-@then(u'the URL should contain the search query')
-def verify_url_contains_query(context):
-    current_url = context.browser.current_url
-    assert "q=" in current_url, \
-        f"Expected URL to contain search query parameter 'q=' but got: '{current_url}'"
+@then(u'the search results page is shown')
+def verify_search_results_page(context):
+    home = Singleton.getInstance(context, HomePage)
+    heading = WebDriverWait(context.browser, 15).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, home.search_heading))
+    )
+    assert "searched" in heading.text.lower(), \
+        f"Expected 'Searched Products' heading but got: '{heading.text}' on '{context.browser.current_url}'"

@@ -1,12 +1,12 @@
 import os
 
 DATA_ACCESS = {
-    "python": {
-        'language': 'python 3',
+    "dress": {
+        'keyword': 'dress',
         'type': 0,
     },
-    "ruby": {
-        'language': 'ruby on rails',
+    "top": {
+        'keyword': 'top',
         'type': 1,
     },
     "valid_user": {

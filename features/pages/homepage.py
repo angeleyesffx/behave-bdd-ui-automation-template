@@ -5,9 +5,11 @@ from features.pages.basepage import BasePage
 
 class HomePage(BasePage):
 
-    project_url = "https://www.google.com/?gws_rd=ssl"
-    search_bar = "q"
-    first_result = "#rso h3"
+    project_url = "https://automationexercise.com/products"
+    search_bar = "search_product"   # id
+    search_button = "submit_search"  # id
+    first_result = ".productinfo p"
+    search_heading = "h2.title"
 
     local_directories = {
         "slogan": "hero__title",

@@ -1,11 +1,11 @@
 @ui @feature-search
 Feature: Search
-  As a web surfer,
-  I want to find information online,
-  So I can learn new things and get tasks done.
+  As a shop visitor,
+  I want to search for products by keyword,
+  So I can quickly find items that interest me.
 
   Background:
-    Given I navigate to the Google Home page
+    Given I navigate to the Products page
 
   @smoke @TC-S001
   Scenario Outline: Successful search returns relevant results
@@ -13,11 +13,11 @@ Feature: Search
     Then I should see the results
 
     Examples:
-      | data   |
-      | python |
-      | ruby   |
+      | data  |
+      | dress |
+      | top   |
 
   @negative @TC-S002
-  Scenario: Search action navigates away from the home page
-    When I search for python
-    Then the URL should contain the search query
+  Scenario: Search filters the product catalogue
+    When I search for dress
+    Then the search results page is shown

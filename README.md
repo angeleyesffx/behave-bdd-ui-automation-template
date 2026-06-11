@@ -1,5 +1,7 @@
 # Python Behave — BDD UI Automation Framework
 
+[![CI](https://github.com/angeleyesffx/behave-bdd-ui-automation-template/actions/workflows/tests.yml/badge.svg)](https://github.com/angeleyesffx/behave-bdd-ui-automation-template/actions/workflows/tests.yml)
+
 A template for browser and API test automation using [Behave](https://behave.readthedocs.io/en/latest/) (Python BDD), Selenium 4, and the Page Object Model pattern.
 
 ---

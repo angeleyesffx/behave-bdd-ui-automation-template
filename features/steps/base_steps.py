@@ -1,8 +1,6 @@
 from behave import *
-from features.object import Singleton
 from features.pages.basepage import BasePage
 import requests
-import xml.etree.ElementTree
 
 
 @given(u'a request to the API')

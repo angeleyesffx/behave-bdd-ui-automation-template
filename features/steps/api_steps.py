@@ -2,11 +2,15 @@ import json
 import os
 
 from behave import *
-from features.steps.data_source.other_datasource import new_information
 from features.pages.basepage import BasePage
 from requests.auth import HTTPBasicAuth
 import requests
 import xml.etree.ElementTree as ET
+
+# Placeholder payload for the Other API — replace with real data or load from a fixture file.
+_OTHER_API_PAYLOAD = {
+    "new_item": {'A': 10, 'B': 1, 'C': 4645, 'D': 86},
+}
 
 
 @given(u'a request to the Some API')
@@ -49,10 +53,8 @@ def send_post_some_request(context):
 
 @when(u'the request sends POST to the Other API')
 def send_post_other_request(context):
-    json_path = os.path.join(os.path.dirname(__file__), 'data_source', 'other_payloads.json')
-    new_information.update({'other_id': context.other_id, 'another_id': context.another_id})
-    json_file = BasePage.edit_json(json_path, new_information)
-    payload = json.loads(json_file[0])
+    payload = dict(_OTHER_API_PAYLOAD)
+    payload.update({'other_id': context.other_id, 'another_id': context.another_id})
     context.response = requests.post(context.endpoint_whatever, json=payload)
     context.json = context.response.json()
 
@@ -61,15 +63,19 @@ def send_post_other_request(context):
 def compare_some_and_whatever_responses(context):
     some_value = BasePage.find_value_on_xml(context.response, 'some_tag_key_xml', context.endpoint_some_api)
     whatever_value = BasePage.find_value_on_xml(context.response_whatever, 'some_tag_key_xml', context.endpoint_whatever)
-    assert some_value == whatever_value
+    assert some_value == whatever_value, \
+        f"Expected Same API and Whatever API to return the same value for 'some_tag_key_xml' but got '{some_value}' vs '{whatever_value}'"
 
 
 @then(u'the wrong password message should be received')
 def wrong_password_auth_message(context):
-    assert context.json['status']['message'].rsplit(' ', 1)[0] == 'Wrong Password for Login ID:'
+    message = context.json['status']['message']
+    assert message.rsplit(' ', 1)[0] == 'Wrong Password for Login ID:', \
+        f"Expected wrong-password message but got: '{message}'"
 
 
 @then(u'the wrong user message should be received')
 def wrong_user_auth_message(context):
     message = context.json['status']['message']
-    assert message.startswith('Login ') and message.endswith(' not in system')
+    assert message.startswith('Login ') and message.endswith(' not in system'), \
+        f"Expected user-not-found message but got: '{message}'"

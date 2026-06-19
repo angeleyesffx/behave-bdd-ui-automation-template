@@ -1,6 +1,5 @@
 from behave import *
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from features.datapool import DATA_ACCESS
@@ -26,6 +25,16 @@ def search_for(context, search_data):
     context.browser.find_element(By.ID, home.search_button).click()
 
 
+@when(u'I submit an empty search')
+def submit_empty_search(context):
+    home = Singleton.getInstance(context, HomePage)
+    search_bar = WebDriverWait(context.browser, 15).until(
+        EC.presence_of_element_located((By.ID, home.search_bar))
+    )
+    search_bar.clear()
+    context.browser.find_element(By.ID, home.search_button).click()
+
+
 @then(u'I should see the results')
 def get_results(context):
     home = Singleton.getInstance(context, HomePage)
@@ -44,3 +53,14 @@ def verify_search_results_page(context):
     )
     assert "searched" in heading.text.lower(), \
         f"Expected 'Searched Products' heading but got: '{heading.text}' on '{context.browser.current_url}'"
+
+
+@then(u'I should see no products found')
+def verify_no_results(context):
+    home = Singleton.getInstance(context, HomePage)
+    WebDriverWait(context.browser, 15).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, home.search_heading))
+    )
+    results = context.browser.find_elements(By.CSS_SELECTOR, home.first_result)
+    assert len(results) == 0, \
+        f"Expected 0 products for non-existent search but found {len(results)} on '{context.browser.current_url}'"

@@ -18,6 +18,11 @@ Feature: Search
       | top   |
 
   @negative @TC-S002
-  Scenario: Search filters the product catalogue
-    When I search for dress
-    Then the search results page is shown
+  Scenario: Search for a non-existent product returns no results
+    When I search for no_results
+    Then I should see no products found
+
+  @smoke @TC-S003
+  Scenario: Empty search returns the full product catalogue
+    When I submit an empty search
+    Then I should see the results
